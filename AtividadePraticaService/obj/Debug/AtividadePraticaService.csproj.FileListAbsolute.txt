@@ -1,0 +1,5 @@
+C:\Projetos\AtividadePratica\AtividadePraticaService\bin\Debug\AtividadePraticaService.dll
+C:\Projetos\AtividadePratica\AtividadePraticaService\bin\Debug\AtividadePraticaService.pdb
+C:\Projetos\AtividadePratica\AtividadePraticaService\obj\Debug\AtividadePraticaService.csprojResolveAssemblyReference.cache
+C:\Projetos\AtividadePratica\AtividadePraticaService\obj\Debug\AtividadePraticaService.dll
+C:\Projetos\AtividadePratica\AtividadePraticaService\obj\Debug\AtividadePraticaService.pdb

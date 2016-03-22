@@ -1,0 +1,4 @@
+C:\Projetos\AtividadePratica\AtividadePraticaCommon\bin\Debug\AtividadePraticaCommon.dll
+C:\Projetos\AtividadePratica\AtividadePraticaCommon\bin\Debug\AtividadePraticaCommon.pdb
+C:\Projetos\AtividadePratica\AtividadePraticaCommon\obj\Debug\AtividadePraticaCommon.dll
+C:\Projetos\AtividadePratica\AtividadePraticaCommon\obj\Debug\AtividadePraticaCommon.pdb

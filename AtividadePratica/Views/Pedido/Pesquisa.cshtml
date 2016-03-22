@@ -1,0 +1,395 @@
+﻿@model AtividadePratica.ViewModels.PedidoViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .thOrdernacao {
+        cursor: pointer;
+    }
+
+    #gridPedidos tbody tr:hover {
+        background-color: rgba(0, 255, 255, 0.28);
+        cursor: pointer;
+    }
+
+    #gridPedidos thead tr th:hover {
+        background-color: rgba(0, 255, 255, 0.28);
+        cursor: pointer;
+    }
+</style>
+<div class="jumbotron">
+    <h1 class="text-center">Consulta de Pedidos</h1>
+    <div class="row">
+        <div class="col-md-5">Tipo Pesquisa</div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default active" id="lblPesquisaFiltro">
+                    <input type="radio" name="tipoPesquisa" value="1" checked/> Filtros
+                </label>
+                <label class="btn btn-default" id="lblPesquisaNumeroPedido">
+                    <input type="radio" name="tipoPesquisa" value="2"/> Número Pedido
+                </label>
+                <label class="btn btn-default" id="lblPesquisaSemFiltros">
+                    <input type="radio" name="tipoPesquisa" value="2"/> Sem Filtros
+                </label>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <form>
+        <div id="divPesquisaFiltros">
+            <div class="row">
+                <div class='col-md-5'>
+                    <div class="form-group">
+                        <label for="email">Cliente</label>
+                        @Html.DropDownList("cliente", Model.ComboCliente, new {@class = "form-control"})
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class='col-md-5'>
+                    <div class="form-group">
+                        <label>Período Data Entrega</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class='col-md-5'>
+                    <div class="form-group">
+                        <div class='input-group date'>
+                            <input type='text' class="form-control" id="dataInicio"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-md-5'>
+                    <div class="form-group">
+                        <div class='input-group date'>
+                            <input type='text' class="form-control" id='dataFim'/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divPesquisaNumeroPedido" style="display: none;">
+            <div class="row">
+                <div class='col-md-5'>
+                    <div class="form-group">
+                        <label for="email">Número Pedido</label>
+                        <input type="text" class="form-control" id="numeroPedido"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class='col-md-12'>
+                <div class="form-group">
+                    <button type="button" class="btn btn-success" id="btnPesquisaPedidos" data-bind="click: btnPesquisaPedidos">Pesquisar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <br/>
+    <div clas="row" id="divGrid" style="display: none;">
+        <table id="gridPedidos" class="table">
+            <thead>
+            <tr data-bind="foreach: headers">
+                <th class="thOrdernacao" data-bind="click: $parent.sort, text: title"></th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: pedidos">
+            <tr data-bind="click: $parent.btnShowItens">
+                <td data-bind="text: Id"></td>
+                <td data-bind="text: NomeCliente"></td>
+                <td data-bind="text: DataEntrega"></td>
+                <td data-bind="text: ValorTotal"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row" id="divBotoesPaginacao" style="display: none;">
+        <div class='col-md-12'>
+            <div class="form-group">
+                <button type="button" disabled="disabled" id="btnPrev" class="btn btn-default" data-bind="click: btnPrevPage">Anterior</button>
+                <button type="button" id="btnNext" class="btn btn-default" data-bind="click: btnNextPage">Próximo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalItens" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" data-bind="text: labelItemPedido"></h4>
+            </div>
+            <div class="modal-body">
+                <table id="gridItensPedido" class="table">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Valor Unid.</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: itensPedido">
+                        <tr>
+                            <td data-bind="text: ProdutoDto.Descricao"></td>
+                            <td data-bind="text: Quantidade"></td>
+                            <td data-bind="text: $parent.formatMoney(ProdutoDto.Valor)"></td>
+                            <td data-bind="text: $parent.formatMoney(ValorTotal)"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var ordenacao = {
+        pedido: false,
+        cliente: false,
+        entrega: false,
+        total: false
+    };
+    var page = 0;
+    var qtdPage = 10;
+    var listPedidos = [];
+    var viewModel = function () {
+        var self = this;
+        self.pedidos = ko.observableArray([]);
+        self.itensPedido = ko.observableArray([]);
+        self.labelItemPedido = ko.observable('');
+        
+        self.headers = [
+            { title: 'Número Pedido', sortKey: 'pedido' },
+            { title: 'Cliente', sortKey: 'cliente' },
+            { title: 'Data Entrega', sortKey: 'entrega' },
+            { title: 'Valor Total', sortKey: 'total' }
+        ];
+
+        self.formatMoney = function(valor) {
+            return 'R$ ' + formatMoeda(valor, 2, ',', '.');
+        }
+
+        self.sort = function (header, event) {
+            var sortKey = header.sortKey;
+            switch (sortKey) {
+            case 'pedido':
+                if(ordenacao.pedido)
+                    self.pedidos.sort(function (a, b) {
+                        return a.Id < b.Id ? -1 : a.Id > b.Id ? 1 : a.Id == b.Id ? 0 : 0;
+                    });
+                else
+                    self.pedidos.sort(function (a, b) {
+                        return a.Id > b.Id ? -1 : a.Id < b.Id ? 1 : a.Id == b.Id ? 0 : 0;
+                    });
+                ordenacao.pedido = !ordenacao.pedido;
+                break;
+            case 'cliente':
+                if (ordenacao.cliente)
+                    self.pedidos.sort(function (a, b) {
+                        return a.NomeCliente < b.NomeCliente ? -1 : a.NomeCliente > b.NomeCliente ? 1 : a.NomeCliente == b.NomeCliente ? 0 : 0;
+                    });
+                else 
+                    self.pedidos.sort(function (a, b) {
+                        return a.NomeCliente > b.NomeCliente ? -1 : a.NomeCliente < b.NomeCliente ? 1 : a.NomeCliente == b.NomeCliente ? 0 : 0;
+                    });
+
+                ordenacao.cliente = !ordenacao.cliente;
+                break;
+            case 'entrega':
+                if (ordenacao.entrega)
+                    self.pedidos.sort(function (a, b) {
+                        return a.DataEntrega < b.DataEntrega ? -1 : a.DataEntrega > b.DataEntrega ? 1 : a.DataEntrega == b.DataEntrega ? 0 : 0;
+                    });
+                else
+                    self.pedidos.sort(function (a, b) {
+                        return a.DataEntrega > b.DataEntrega ? -1 : a.DataEntrega < b.DataEntrega ? 1 : a.DataEntrega == b.DataEntrega ? 0 : 0;
+                    });
+                ordenacao.entrega = !ordenacao.entrega;
+                break;
+            case 'total':
+                if (ordenacao.total)
+                    self.pedidos.sort(function (a, b) {
+                        return a.ValorTotal < b.ValorTotal ? -1 : a.ValorTotal > b.ValorTotal ? 1 : a.ValorTotal == b.ValorTotal ? 0 : 0;
+                    });
+                else
+                    self.pedidos.sort(function (a, b) {
+                        return a.ValorTotal > b.ValorTotal ? -1 : a.ValorTotal < b.ValorTotal ? 1 : a.ValorTotal == b.ValorTotal ? 0 : 0;
+                    });
+                ordenacao.total = !ordenacao.total;
+                break;
+            }
+        };
+
+        self.btnPesquisaPedidos = function () {
+            if ($('#divPesquisaNumeroPedido').css('display') == 'none')
+                pesquisaFiltros(self);
+            else
+                pesquisaNumeroPedido(self);
+
+            $('#divBotoesPaginacao').slideDown();
+        }
+
+        self.btnShowItens = function (item) {
+            var pedido = this;
+            $.get('http://localhost:1600/api/Pedido/' + item.Id + '/Items')
+                .success(function (data) {
+                    self.itensPedido(data);
+                    self.labelItemPedido("Itens do Pedido - " + item.Id);
+                    $('#modalItens').modal('show');
+                }).error(function(xhr) {
+                    toastr.error(xhr.responseText);
+                });
+        }
+
+        self.btnNextPage = function () {
+            page++;
+            paginacao(self);
+            ajustaBotoesPaginacao();
+        };
+
+        self.btnPrevPage = function () {
+            --page;
+            paginacao(self);
+            ajustaBotoesPaginacao();
+
+        }
+    }
+
+    ko.applyBindings(new viewModel());
+
+    function pesquisaFiltros(self) {
+        var codigoCliente = !$('#cliente').prop('disabled') ? $('#cliente').val() : null;
+        var dataInicio = !$('#dataInicio').prop('disabled') ? $('#dataInicio').val() : null;
+        var dataFim = !$('#dataFim').prop('disabled') ? $('#dataFim').val() : null;
+
+        if (dataInicio != null && dataFim != null) {
+            if ((dataInicio != "" && dataFim == "") || (dataInicio == "" && dataFim != "")) {
+                toastr.warning('Preencha as duas datas.');
+                return false;
+            }else 
+            if (checarDatas(dataInicio, dataFim)) {
+                toastr.warning('Data inicio deve ser menor que data fim.');
+                return;
+            }
+        }
+
+        $.get('http://localhost:1600/api/Pedido',
+        {
+            codigoCliente: codigoCliente,
+            dataInicio: formatData(dataInicio),
+            dataFim: formatData(dataFim)
+        }).success(function (data) {
+            listPedidos = data;
+            paginacao(self);
+            $('#divGrid').slideDown();
+        }).error(function (xhr) {
+            toastr.error(xhr.responseText);
+        });
+    }
+
+    function pesquisaNumeroPedido(self) {
+
+        if ($('#numeroPedido').val() == "") {
+            toastr.warning('Informe o número do pedido.');
+            $('#numeroPedido').focus();
+            return false;
+        }
+
+        $.get('http://localhost:1600/api/Pedido/' + $('#numeroPedido').val())
+            .success(function (data) {
+                listPedidos = data;
+                paginacao(self);
+                $('#divGrid').slideDown();
+            }).error(function (xhr) {
+                toastr.error(xhr.responseText);
+            });
+    }
+
+    $('#cliente').select2();
+    
+    $('#lblPesquisaFiltro').click(function () {
+        if ($('#divPesquisaFiltros').css('display') == 'block')
+            return;
+
+        bloqueiaFiltros();
+        $('#cliente,#dataEntrega,#dataFim').prop('disabled', false);
+        $('#divPesquisaNumeroPedido').slideUp(function () {
+            $('#divPesquisaFiltros').slideDown();
+        });
+    });
+
+    $('#lblPesquisaNumeroPedido').click(function () {
+        if ($('#divPesquisaNumeroPedido').css('display') == 'block')
+            return;
+
+        bloqueiaFiltros();
+        $('#numeroPedido').prop('disabled', false);
+        $('#divPesquisaFiltros').slideUp(function () {
+            $('#divPesquisaNumeroPedido').slideDown();
+        });
+    });
+
+    $('#lblPesquisaSemFiltros').click(function() {
+        $('#divPesquisaFiltros, #divPesquisaNumeroPedido').slideUp();
+        bloqueiaFiltros();
+    });
+
+    function bloqueiaFiltros() {
+        $('#cliente,#dataEntrega,#numeroPedido').prop('disabled', true);
+    }
+
+    function paginacao(self) {
+        var listAux = [];
+        for (var i = page * qtdPage; i < listPedidos.length && i < (page + 1) * qtdPage; i++)
+            for (var i = page * qtdPage; i < listPedidos.length && i < (page + 1) * qtdPage; i++) {
+                listAux.push(listPedidos[i]);
+            }
+        self.pedidos(listAux);
+    }
+
+    function ajustaBotoesPaginacao() {
+
+        if (page == 0){
+            $('#btnPrev').prop('disabled', true);
+            $('#btnNext').prop('disabled', false);
+            return;
+        }
+        else
+            $('#btnPrev').prop('disabled', false);
+
+        if (page < (listPedidos.length / page) - 1){
+            $('#btnNext').prop('disabled', true);
+        } else {
+            $('#btnNext').prop('disabled', false);
+        }
+
+        
+    }
+
+    $('#dataInicio, #dataFim').mask('99/99/9999');
+    $('#numeroPedido').mask('999');
+    $('#dataInicio,#dataFim').blur(function() {
+        if ($(this).val() == "")
+            return;
+
+        if (!validaData($(this).val())) {
+            toastr.warning('Data inválida.');
+            $(this).val('').focus();
+        }
+    });
+    $('.ko-grid').addClass('table');
+
+</script>

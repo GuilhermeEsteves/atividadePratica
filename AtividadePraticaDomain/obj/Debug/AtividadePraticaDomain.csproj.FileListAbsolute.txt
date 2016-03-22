@@ -1,0 +1,12 @@
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\AtividadePraticaDomain.dll.config
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\AtividadePraticaDomain.dll
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\AtividadePraticaDomain.pdb
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\AtividadePraticaCommon.dll
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\Newtonsoft.Json.dll
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\System.Net.Http.Formatting.dll
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\AtividadePraticaCommon.pdb
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\Newtonsoft.Json.xml
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\bin\Debug\System.Net.Http.Formatting.xml
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\obj\Debug\AtividadePraticaDomain.csprojResolveAssemblyReference.cache
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\obj\Debug\AtividadePraticaDomain.dll
+C:\Projetos\AtividadePratica\AtividadePraticaDomain\obj\Debug\AtividadePraticaDomain.pdb

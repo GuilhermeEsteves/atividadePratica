@@ -1,0 +1,209 @@
+﻿@model AtividadePratica.ViewModels.PedidoViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="jumbotron">
+    <h1 class="text-center">Pedido de Vendas</h1>
+    <form>
+        <div class="row">
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="email">Cliente</label>
+                    @Html.DropDownList("cliente", Model.ComboCliente, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="email">Data Entrega</label>
+                    <div class='input-group date'>
+                        <input type='text' class="form-control" id="dataEntrega" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label>Itens do Pedido</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="email">Produto</label>
+                    <select id="produto" class="form-control">
+                        @foreach (var produto in Model.Produtos)
+                        {
+                            <option value="@produto.Id" data-valor="@produto.Valor">
+                                @(produto.Descricao + " - R$ " + produto.Valor)
+                            </option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="email">Quantidade</label>
+                    <input type="text" id="quantidade" class="form-control"/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <button type="button" class="btn btn-success"
+                            data-bind="click: btnAdicionaProduto">
+                        + Adicionar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <br />
+    <div clas="row">
+        <div data-bind='simpleGrid: gridViewModel'> </div>
+        <table id="gridPedidos" class="table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Valor Unid.</th>
+                    <th>Valor Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: itensPedido">
+                <tr>
+                    <td data-bind="text: Descricao"></td>
+                    <td data-bind="text: Quantidade"></td>
+                    <td data-bind="text: Valor"></td>
+                    <td data-bind="text: ValorTotal"></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm"
+                                data-bind="click: $parent.btnExcluirProduto">
+                            excluir
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <div class='col-md-12'>
+            <div class="form-group">
+                <label>Valor Total:</label>
+                <label data-bind="text: TotalPedidoLabel"></label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class='col-md-5'>
+            <div class="form-group">
+                <button type="button" class="btn btn-success"
+                        data-bind="click: btnSalvarPedido">
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#cliente, #produto').select2();
+
+    var viewModel = function () {
+        var self = this;
+        self.itensPedido = ko.observableArray([]);
+
+        self.btnExcluirProduto = function () {
+            self.TotalPedido -= parseFloat(this.ValorTotal.toString().replace('.',''));
+            self.TotalPedidoLabel("R$ " + (formatMoeda(self.TotalPedido, 2, ',', '.')));
+            self.itensPedido.remove(this);
+        }
+
+        self.btnAdicionaProduto = function () {
+
+            if ($('#quantidade').val() == "") {
+                toastr.warning('Adicione uma quantidade.');
+                return;
+            }
+
+            var produto = $('#produto option:selected');
+            var quantidade = parseInt($('#quantidade').val());
+            var valorXquantidade = parseFloat(produto.attr('data-valor')) * quantidade;
+            self.itensPedido.push({
+                Id: produto.val(),
+                Descricao: produto.text(),
+                Quantidade: quantidade,
+                Valor: formatMoeda(parseFloat(produto.attr('data-valor')), 2, ',', '.'),
+                ValorTotal: formatMoeda(valorXquantidade, 2, ',', '.')
+            });
+
+            self.TotalPedido += valorXquantidade;
+            self.TotalPedidoLabel("R$ " + (formatMoeda(self.TotalPedido, 2, ',', '.')));
+        }
+
+        self.btnSalvarPedido = function () {
+
+            var dataEntrega = $('#dataEntrega').val();
+
+            if ($('#dataEntrega').val() == "") {
+                toastr.warning('Sem data de entrega.');
+                return;
+            }
+
+            if (checarDataAual(dataEntrega)) {
+                toastr.warning('Data entrega deve ser maior ou igual a atual.');
+                return;
+            }
+
+            if (self.itensPedido().length == 0) {
+                toastr.warning('Pedido sem itens.');
+                return;
+            }
+
+            var pedido = {
+                IdCliente: $('#cliente').val(),
+                DataEntrega: formatData(dataEntrega.toString()),
+                ItensPedido: []
+            };
+
+            for (var i = 0; i < self.itensPedido().length; i++)
+                pedido.ItensPedido.push({
+                    IdProduto: self.itensPedido()[i].Id,
+                    Quantidade: self.itensPedido()[i].Quantidade
+                });
+
+            $.post('http://localhost:1600/api/Pedido', pedido).success(function() {
+                toastr.success('Pedido efetuado!');
+                $('#dataEntrega,#quantidade').val('');
+                self.itensPedido([]);
+                self.TotalPedido = 0;
+                self.TotalPedidoLabel('R$ 0,00')
+            }).error(function(xhr) {
+                toastr.error(xhr.responseText);
+            });
+        }
+
+        self.TotalPedido = 0;
+        self.TotalPedidoLabel = ko.observable("R$ 0,00");
+    }
+
+    ko.applyBindings(new viewModel());
+
+    $('#dataEntrega').blur(function() {
+        if ($(this).val() == "")
+            return;
+
+        if (!validaData($(this).val())) {
+            toastr.warning('Data inválida.');
+            $(this).val('').focus();
+        }
+    });
+    $('#quantidade').mask('999');
+    $('#dataEntrega').mask('99/99/9999');
+</script>
