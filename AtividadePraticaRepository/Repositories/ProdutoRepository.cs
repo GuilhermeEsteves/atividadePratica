@@ -12,5 +12,14 @@ namespace AtividadePraticaRepository.Repositories
             using (var context = new Context())
                 return context.DbProduto.ToList();
         }
+
+        public void Post(List<Produto> produtos)
+        {
+            using (var context = new Context())
+            {
+                context.DbProduto.AddRange(produtos);
+                context.SaveChanges();
+            }
+        } 
     }
 }

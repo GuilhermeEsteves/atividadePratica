@@ -20,9 +20,6 @@ namespace AtividadePraticaDomain.Services
         {
             var produtos = _produtoRepository.Get();
 
-            if (!produtos.Any())
-                return Response(HttpStatusCode.NoContent);
-
             return Response(HttpStatusCode.OK, 
                 produtos.Select(p => new ProdutoDto(p)));
         } 

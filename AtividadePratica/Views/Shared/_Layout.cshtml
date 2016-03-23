@@ -34,6 +34,9 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Consulta Pedido", "Pesquisa", "Pedido")</li>
                     <li>@Html.ActionLink("Pedido Vendas", "Vendas", "Pedido")</li>
+                    <li>
+                        <a onclick="carregarBanco();" href="javascript:void(0);">Carregar Tabelas Banco</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -49,3 +52,12 @@
     @RenderSection("scripts", required: false)
 </body>
 </html>
+<script>
+    function carregarBanco() {
+        $.post('http://localhost:1600/api/CargaBanco').success(function() {
+            toastr.success('Tabelas Carregadas.');
+        }).error(function(xhr) {
+            toastr.error(xhr.responseText);
+        });
+    }
+</script>

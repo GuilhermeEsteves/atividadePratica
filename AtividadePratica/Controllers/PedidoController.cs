@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using AtividadePraticaService.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net;
 using AtividadePratica.ViewModels;
 using AtividadePraticaDomain.Models;
 
@@ -25,23 +26,25 @@ namespace AtividadePratica.Controllers
             {
                 var response = _clienteService.Get();
 
-                if (response.IsSuccessStatusCode)
+                if (response.StatusCode == HttpStatusCode.InternalServerError)
                 {
-                    var clientes = JsonConvert.DeserializeObject<IEnumerable<Cliente>>
-                        (response.Content.ReadAsStringAsync().Result);
-
-                    var pedidoModel = new PedidoViewModel(
-                            new SelectList(clientes, "Id", "Nome")
-                        );
-
-                    return View(pedidoModel);
+                    ViewBag.Error = "Falha ao carrgar a tela de pesquisa de pedido";
+                    return View("Error");
                 }
+                
+                var clientes = JsonConvert.DeserializeObject<IEnumerable<Cliente>>
+                    (response.Content.ReadAsStringAsync().Result);
 
-                return PartialView("Error","Falha ao carrgar a tela de pesquisa de pedido");
+                var pedidoModel = new PedidoViewModel(
+                        new SelectList(clientes, "Id", "Nome")
+                    );
+
+                return View(pedidoModel);
             }
             catch (Exception ex)
             {
-                return View("Error",ex.Message);
+                ViewBag.Error = ex.Message;
+                return View("Error");
             }
         }
 
@@ -50,15 +53,21 @@ namespace AtividadePratica.Controllers
             try
             {
                 var responseCliente = _clienteService.Get();
-                if (!responseCliente.IsSuccessStatusCode)
-                    return View("Error", "Falha ao carregar combo de cliente");
+                if (responseCliente.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    ViewBag.Error = "Falha ao carregar combo de cliente";
+                    return View("Error");
+                }
 
                 var clientes = JsonConvert.DeserializeObject<IEnumerable<Cliente>>
                     (responseCliente.Content.ReadAsStringAsync().Result);
 
                 var responseProduto = _produtoService.Get();
-                if (!responseProduto.IsSuccessStatusCode)
-                    return View("Error", "Falha ao carregar combo de produto");
+                if (responseProduto.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    ViewBag.Error = "Falha ao carregar combo de produto";
+                    return View("Error");
+                }
 
                 var produtos = JsonConvert.DeserializeObject<IEnumerable<Produto>>
                     (responseProduto.Content.ReadAsStringAsync().Result);
@@ -72,7 +81,8 @@ namespace AtividadePratica.Controllers
             }
             catch (Exception ex)
             {
-                return View("Error", ex.Message);
+                ViewBag.Error = ex.Message;
+                return View("PageErro", ex.Message);
             }
         }
     }

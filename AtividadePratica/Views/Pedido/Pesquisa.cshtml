@@ -1,5 +1,6 @@
 ﻿@model AtividadePratica.ViewModels.PedidoViewModel
 @{
+    ViewBag.Title = "Consulta de Pedidos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -118,8 +119,8 @@
     <div class="row" id="divBotoesPaginacao" style="display: none;">
         <div class='col-md-12'>
             <div class="form-group">
-                <button type="button" disabled="disabled" id="btnPrev" class="btn btn-default" data-bind="click: btnPrevPage">Anterior</button>
-                <button type="button" id="btnNext" class="btn btn-default" data-bind="click: btnNextPage">Próximo</button>
+                <button type="button" disabled id="btnPrev" class="btn btn-primary" data-bind="click: btnPrevPage">Anterior</button>
+                <button type="button" disabled id="btnNext" class="btn btn-primary" data-bind="click: btnNextPage">Próximo</button>
             </div>
         </div>
     </div>
@@ -165,12 +166,12 @@
     var page = 0;
     var qtdPage = 10;
     var listPedidos = [];
-    var viewModel = function () {
+    var viewModel = function() {
         var self = this;
         self.pedidos = ko.observableArray([]);
         self.itensPedido = ko.observableArray([]);
         self.labelItemPedido = ko.observable('');
-        
+
         self.headers = [
             { title: 'Número Pedido', sortKey: 'pedido' },
             { title: 'Cliente', sortKey: 'cliente' },
@@ -182,27 +183,27 @@
             return 'R$ ' + formatMoeda(valor, 2, ',', '.');
         }
 
-        self.sort = function (header, event) {
+        self.sort = function(header, event) {
             var sortKey = header.sortKey;
             switch (sortKey) {
             case 'pedido':
-                if(ordenacao.pedido)
-                    self.pedidos.sort(function (a, b) {
+                if (ordenacao.pedido)
+                    self.pedidos.sort(function(a, b) {
                         return a.Id < b.Id ? -1 : a.Id > b.Id ? 1 : a.Id == b.Id ? 0 : 0;
                     });
                 else
-                    self.pedidos.sort(function (a, b) {
+                    self.pedidos.sort(function(a, b) {
                         return a.Id > b.Id ? -1 : a.Id < b.Id ? 1 : a.Id == b.Id ? 0 : 0;
                     });
                 ordenacao.pedido = !ordenacao.pedido;
                 break;
             case 'cliente':
                 if (ordenacao.cliente)
-                    self.pedidos.sort(function (a, b) {
+                    self.pedidos.sort(function(a, b) {
                         return a.NomeCliente < b.NomeCliente ? -1 : a.NomeCliente > b.NomeCliente ? 1 : a.NomeCliente == b.NomeCliente ? 0 : 0;
                     });
-                else 
-                    self.pedidos.sort(function (a, b) {
+                else
+                    self.pedidos.sort(function(a, b) {
                         return a.NomeCliente > b.NomeCliente ? -1 : a.NomeCliente < b.NomeCliente ? 1 : a.NomeCliente == b.NomeCliente ? 0 : 0;
                     });
 
@@ -210,22 +211,22 @@
                 break;
             case 'entrega':
                 if (ordenacao.entrega)
-                    self.pedidos.sort(function (a, b) {
+                    self.pedidos.sort(function(a, b) {
                         return a.DataEntrega < b.DataEntrega ? -1 : a.DataEntrega > b.DataEntrega ? 1 : a.DataEntrega == b.DataEntrega ? 0 : 0;
                     });
                 else
-                    self.pedidos.sort(function (a, b) {
+                    self.pedidos.sort(function(a, b) {
                         return a.DataEntrega > b.DataEntrega ? -1 : a.DataEntrega < b.DataEntrega ? 1 : a.DataEntrega == b.DataEntrega ? 0 : 0;
                     });
                 ordenacao.entrega = !ordenacao.entrega;
                 break;
             case 'total':
                 if (ordenacao.total)
-                    self.pedidos.sort(function (a, b) {
+                    self.pedidos.sort(function(a, b) {
                         return a.ValorTotal < b.ValorTotal ? -1 : a.ValorTotal > b.ValorTotal ? 1 : a.ValorTotal == b.ValorTotal ? 0 : 0;
                     });
                 else
-                    self.pedidos.sort(function (a, b) {
+                    self.pedidos.sort(function(a, b) {
                         return a.ValorTotal > b.ValorTotal ? -1 : a.ValorTotal < b.ValorTotal ? 1 : a.ValorTotal == b.ValorTotal ? 0 : 0;
                     });
                 ordenacao.total = !ordenacao.total;
@@ -233,7 +234,7 @@
             }
         };
 
-        self.btnPesquisaPedidos = function () {
+        self.btnPesquisaPedidos = function() {
             if ($('#divPesquisaNumeroPedido').css('display') == 'none')
                 pesquisaFiltros(self);
             else
@@ -242,10 +243,10 @@
             $('#divBotoesPaginacao').slideDown();
         }
 
-        self.btnShowItens = function (item) {
+        self.btnShowItens = function(item) {
             var pedido = this;
             $.get('http://localhost:1600/api/Pedido/' + item.Id + '/Items')
-                .success(function (data) {
+                .success(function(data) {
                     self.itensPedido(data);
                     self.labelItemPedido("Itens do Pedido - " + item.Id);
                     $('#modalItens').modal('show');
@@ -254,13 +255,13 @@
                 });
         }
 
-        self.btnNextPage = function () {
+        self.btnNextPage = function() {
             page++;
             paginacao(self);
             ajustaBotoesPaginacao();
         };
 
-        self.btnPrevPage = function () {
+        self.btnPrevPage = function() {
             --page;
             paginacao(self);
             ajustaBotoesPaginacao();
@@ -279,8 +280,7 @@
             if ((dataInicio != "" && dataFim == "") || (dataInicio == "" && dataFim != "")) {
                 toastr.warning('Preencha as duas datas.');
                 return false;
-            }else 
-            if (checarDatas(dataInicio, dataFim)) {
+            } else if (checarDatas(dataInicio, dataFim)) {
                 toastr.warning('Data inicio deve ser menor que data fim.');
                 return;
             }
@@ -291,11 +291,12 @@
             codigoCliente: codigoCliente,
             dataInicio: formatData(dataInicio),
             dataFim: formatData(dataFim)
-        }).success(function (data) {
+        }).success(function(data) {
             listPedidos = data;
             paginacao(self);
             $('#divGrid').slideDown();
-        }).error(function (xhr) {
+            ajustaBotoesPaginacao();
+        }).error(function(xhr) {
             toastr.error(xhr.responseText);
         });
     }
@@ -309,35 +310,36 @@
         }
 
         $.get('http://localhost:1600/api/Pedido/' + $('#numeroPedido').val())
-            .success(function (data) {
+            .success(function(data) {
                 listPedidos = data;
                 paginacao(self);
                 $('#divGrid').slideDown();
-            }).error(function (xhr) {
+                ajustaBotoesPaginacao();
+            }).error(function(xhr) {
                 toastr.error(xhr.responseText);
             });
     }
 
     $('#cliente').select2();
-    
-    $('#lblPesquisaFiltro').click(function () {
+
+    $('#lblPesquisaFiltro').click(function() {
         if ($('#divPesquisaFiltros').css('display') == 'block')
             return;
 
         bloqueiaFiltros();
         $('#cliente,#dataEntrega,#dataFim').prop('disabled', false);
-        $('#divPesquisaNumeroPedido').slideUp(function () {
+        $('#divPesquisaNumeroPedido').slideUp(function() {
             $('#divPesquisaFiltros').slideDown();
         });
     });
 
-    $('#lblPesquisaNumeroPedido').click(function () {
+    $('#lblPesquisaNumeroPedido').click(function() {
         if ($('#divPesquisaNumeroPedido').css('display') == 'block')
             return;
 
         bloqueiaFiltros();
         $('#numeroPedido').prop('disabled', false);
-        $('#divPesquisaFiltros').slideUp(function () {
+        $('#divPesquisaFiltros').slideUp(function() {
             $('#divPesquisaNumeroPedido').slideDown();
         });
     });
@@ -358,25 +360,20 @@
                 listAux.push(listPedidos[i]);
             }
         self.pedidos(listAux);
+        ajustaBotoesPaginacao();
     }
 
     function ajustaBotoesPaginacao() {
 
-        if (page == 0){
+        if (page == 0) 
             $('#btnPrev').prop('disabled', true);
-            $('#btnNext').prop('disabled', false);
-            return;
-        }
         else
             $('#btnPrev').prop('disabled', false);
 
-        if (page < (listPedidos.length / page) - 1){
+        if (listPedidos.length - page * qtdPage > qtdPage)
+            $('#btnNext').prop('disabled',false);
+         else 
             $('#btnNext').prop('disabled', true);
-        } else {
-            $('#btnNext').prop('disabled', false);
-        }
-
-        
     }
 
     $('#dataInicio, #dataFim').mask('99/99/9999');

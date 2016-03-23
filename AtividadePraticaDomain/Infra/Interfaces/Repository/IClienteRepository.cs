@@ -6,5 +6,7 @@ namespace AtividadePraticaDomain.Infra.Interfaces.Repository
     public interface IClienteRepository
     {
         IEnumerable<Cliente> Get();
+        void Post(List<Cliente> clientes);
+        bool TableLoad();
     }
 }

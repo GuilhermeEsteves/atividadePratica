@@ -5,9 +5,9 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtividadePratica", "AtividadePratica\AtividadePratica.csproj", "{0DB31A01-61DE-4E19-A05F-304A6A45F603}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Presentation", "0 - Presentation", "{B9EB4BBA-FD51-4E5A-A76D-F7AA7BEEA457}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Presentation", "1 - Presentation", "{B9EB4BBA-FD51-4E5A-A76D-F7AA7BEEA457}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Service", "1 - Service", "{431A7E57-DA35-4D63-A86B-822C5E1039F9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Service", "2 - Service", "{431A7E57-DA35-4D63-A86B-822C5E1039F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - WebApi", "3 - WebApi", "{65AB7B3D-B1E6-4B7D-BF2D-51837A6D47C8}"
 EndProject

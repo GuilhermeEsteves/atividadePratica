@@ -172,6 +172,7 @@
     <Content Include="Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\images\error.png" />
     <Content Include="Content\jquery-ui.css" />
     <Content Include="Content\select2.css" />
     <Content Include="Content\toastr.min.css" />
@@ -227,6 +228,7 @@
     <Content Include="Scripts\knockout.mapping.js" />
     <Content Include="Views\Pedido\Pesquisa.cshtml" />
     <Content Include="Views\Pedido\Vendas.cshtml" />
+    <Content Include="Views\Pedido\PageErro.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

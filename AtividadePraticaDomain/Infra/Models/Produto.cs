@@ -1,10 +1,20 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace AtividadePraticaDomain.Models
 {
     public class Produto : BaseModel
     {
+        public Produto()
+        {
+            
+        }
+
+        public Produto(string descricao, decimal valor)
+        {
+            Descricao = descricao;
+            Valor = valor;
+        }
+
         public string Descricao { get; set; }
 
         public decimal Valor { get; set; }

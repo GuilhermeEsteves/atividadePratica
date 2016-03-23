@@ -21,6 +21,8 @@ namespace AtividadePraticaWebApi.Infra.Ioc
             container.Register<IPedidoService, PedidoService>();
             container.Register<IPedidoRepository, PedidoRepository>();
 
+            container.Register<ICargaBancoService, CargaBancoService>();
+
             container.Verify();
             return container;
         } 

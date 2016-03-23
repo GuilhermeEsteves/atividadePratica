@@ -32,9 +32,6 @@ namespace AtividadePraticaDomain.Services
             dataFim = dataFim.MaxTimeDay();
 
             var pedidos = _pedidoRepository.Get(codigoCliente, dataInicio, dataFim);
-               
-            if(!pedidos.Any())
-                return Response(HttpStatusCode.NoContent);
 
             return Response(HttpStatusCode.OK, 
                 pedidos.Select(p => new PedidoDto(p)));
@@ -43,9 +40,6 @@ namespace AtividadePraticaDomain.Services
         public HttpResponseMessage Get(int codigoPedido)
         {
             var pedidos = _pedidoRepository.Get(codigoPedido);
-
-            if (!pedidos.Any())
-                return Response(HttpStatusCode.NoContent);
 
             return Response(HttpStatusCode.OK, 
                 pedidos.Select(p => new PedidoDto(p)));
@@ -62,6 +56,13 @@ namespace AtividadePraticaDomain.Services
             if (pedido.DataEntrega.Date < DateTime.Now.Date)
                 return Response(HttpStatusCode.BadRequest, "Data de entrega menor que dia atual.");
 
+            pedido.ItensPedido = pedido.ItensPedido.GroupBy(x => x.IdProduto).Select(i => new ItemPedido()
+            {
+                IdProduto = i.Key,
+                Quantidade = pedido.ItensPedido
+                    .Where(c => c.IdProduto == i.Key).Sum(t => t.Quantidade)
+            }).ToList();
+
             _pedidoRepository.Post(pedido);
             return Response(HttpStatusCode.Created);
         }
@@ -69,9 +70,6 @@ namespace AtividadePraticaDomain.Services
         public HttpResponseMessage GetItems(int codigoPedido)
         {
             var items = _pedidoRepository.GetItems(codigoPedido);
-
-            if(!items.Any())
-                return Response(HttpStatusCode.NoContent);
 
             return Response(HttpStatusCode.OK, items.Select(i => new ItemPedidoDto(i)));
         }

@@ -1,10 +1,15 @@
 ﻿@model string
 @{
-    Layout = "../Shared/_Layout.cshtml";
+    Layout = null;
 }
 
-<hgroup>
-    <h1>Que Feio Servidor :(.</h1>
-    <h2>@Model</h2>
-</hgroup>
+<div style="margin-top: 200px">
+    <center>
+        <img src="~/Content/images/error.png" />
+        <h2>@ViewBag.Error</h2>
+        <br/>
+        <a href="/">Voltar ao inicio</a>
+    </center>
+</div>
+
 
